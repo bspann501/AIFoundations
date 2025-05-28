@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Foundations: Successes & Challenges - Interactive Infographic</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Visualization & Content Choices: 
+        - Slide 1 (Header): Large text. Goal: Inform.
+        - Slide 2 (Intro): Text, HTML/CSS Timeline (Goal: Change), HTML/CSS Info Cards (Goal: Inform). Justification: Clear progression and key takeaways.
+        - Slide 3 (Success Overview): Text, HTML/CSS Pictograph (Unicode icons) (Goal: Inform). Justification: Visual cues for categories.
+        - Slide 4 (ML/DL): Text, Donut Chart (Chart.js Canvas) (Goal: Compare). Justification: Proportional impact.
+        - Slide 5 (NLP): Text, Bar Chart (Chart.js Canvas) (Goal: Compare). Justification: Capability comparison.
+        - Slide 6 (CV): Text, Stacked Bar Chart (Chart.js Canvas) (Goal: Change/Compare). Justification: Sectoral growth over time.
+        - Slide 7 (Healthcare): Text, HTML/CSS Big Number (Goal: Inform), HTML List (Goal: Organize). Justification: Highlight key stat and details.
+        - Slide 8 (Creative/Gaming): Text, Bubble Chart (Chart.js Canvas) (Goal: Compare). Justification: Multi-dimensional impact.
+        - Slide 9 (Challenges Intro): Text. Goal: Inform.
+        - Slide 10 (Ethics): Text, HTML/CSS Venn Diagram (Goal: Organize). Justification: Intersecting bias sources.
+        - Slide 11 (XAI): Text, HTML/CSS Flowchart (Goal: Organize). Justification: Process comparison.
+        - Slide 12 (Data Req): Text, HTML/CSS Pyramid (Goal: Organize). Justification: Hierarchical needs.
+        - Slide 13 (Robustness): Text, Bar Chart (Chart.js Canvas) (Goal: Compare). Justification: Impact demonstration.
+        - Slide 14 (Societal Impact): Text, Line Chart (Chart.js Canvas) (Goal: Change). Justification: Temporal trends.
+        - Slide 15 (AI Today): Text, HTML/CSS Word Cloud (Goal: Inform/Compare). Justification: Sectoral impact visualization.
+        - Slide 16 (Future): Text, HTML List (Goal: Organize). Justification: Clear future outlook.
+        - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. All charts are Chart.js Canvas. Diagrams are HTML/CSS/Unicode.
+    -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F0F0F0; /* Light Gray background */
+            color: #073B4C; /* Midnight Blue/Dark Teal text */
+        }
+        .nav-active {
+            font-weight: 700;
+            color: #FF6B6B; /* Coral Red for active nav link */
+        }
+        .card {
+            background-color: #FFFFFF; /* White card background */
+            color: #073B4C; /* Dark text on light card */
+            border: 1px solid #E0E0E0; /* Light gray border */
+            scroll-margin-top: 80px; /* Offset for sticky nav */
+        }
+        .dark-card { 
+             background-color: #073B4C; /* Midnight Blue/Dark Teal card */
+             color: #FFFFFF; /* White text on dark card */
+             scroll-margin-top: 80px;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px; /* Max width for readability */
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px; /* Increased base height for better visuals */
+            max-height: 450px; /* Increased max height */
+        }
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 300px; /* Slightly smaller on mobile */
+                max-height: 400px;
+            }
+        }
+        .text-coral-red { color: #FF6B6B; }
+        .bg-coral-red { background-color: #FF6B6B; }
+        .text-sunny-yellow { color: #FFD166; }
+        .bg-sunny-yellow { background-color: #FFD166; }
+        .text-turquoise-green { color: #06D6A0; }
+        .bg-turquoise-green { background-color: #06D6A0; }
+        .text-cerulean-blue { color: #118AB2; }
+        .bg-cerulean-blue { background-color: #118AB2; }
+        .text-midnight-blue { color: #073B4C; }
+        .bg-midnight-blue { background-color: #073B4C; }
+
+        .timeline-item {
+            position: relative;
+            padding-left: 2.5rem; 
+            padding-bottom: 1.5rem;
+            border-left: 3px solid #FFD166; 
+        }
+        .timeline-item:last-child {
+            border-left: none;
+            padding-left: calc(2.5rem + 3px); 
+        }
+        .timeline-item:last-child::before { /* Draw a line to the last dot if border is removed */
+            content: '';
+            position: absolute;
+            left: -1.5px; /* Center on where the border would be */
+            top: 0;
+            bottom: calc(100% - 0.6rem); /* Stop at the dot */
+            width: 3px;
+            background-color: #FFD166;
+             z-index: -1;
+        }
+        .timeline-dot {
+            position: absolute;
+            left: -0.65rem; 
+            top: 0.5rem;
+            width: 1.2rem;
+            height: 1.2rem;
+            border-radius: 50%;
+            background-color: #FFD166; 
+            border: 3px solid #F0F0F0; 
+        }
+        .flowchart-node {
+            border: 2px solid #06D6A0; 
+            background-color: #E0E7FF; /* Light Indigo for nodes */
+            color: #073B4C; 
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .flowchart-arrow {
+            font-size: 2.5rem;
+            color: #06D6A0; 
+            margin: 0.5rem 0;
+            line-height: 1;
+            text-align: center;
+        }
+        .venn-circle {
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-weight: 500;
+            padding: 1.5rem;
+            color: #FFFFFF;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .pyramid-level {
+            padding: 1rem;
+            margin: 0.25rem auto; /* Centered pyramid levels */
+            text-align: center;
+            color: #FFFFFF;
+            border-radius: 0.375rem; /* Rounded-md */
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .word-cloud span {
+            padding: 0.4rem 0.8rem;
+            border-radius: 0.375rem; /* Rounded-md */
+            margin: 0.3rem;
+            display: inline-block;
+            color: #FFFFFF;
+            font-weight: 500;
+            transition: transform 0.2s ease-in-out;
+        }
+        .word-cloud span:hover {
+            transform: scale(1.1);
+        }
+        .stat-big-number {
+            font-size: 4rem; 
+            font-weight: 700;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        #main-nav button {
+            transition: color 0.2s ease-in-out, font-weight 0.2s ease-in-out;
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <nav id="main-nav" class="sticky top-0 z-50 bg-white shadow-md py-3 px-4">
+        <div class="container mx-auto flex flex-wrap justify-center items-center space-x-2 md:space-x-3 text-xs sm:text-sm">
+            <button data-target="intro" class="hover:text-coral-red p-1">Intro</button>
+            <button data-target="successes-overview" class="hover:text-coral-red p-1">Successes</button>
+            <button data-target="challenges-overview" class="hover:text-coral-red p-1">Challenges</button>
+            <button data-target="ai-today" class="hover:text-coral-red p-1">AI Today</button>
+            <button data-target="future-role" class="hover:text-coral-red p-1">Future</button>
+        </div>
+    </nav>
+
+    <header id="header" class="py-12 md:py-16 text-center bg-cerulean-blue text-white shadow-xl">
+        <div class="container mx-auto px-4">
+            <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold">AI: Successes and Challenges</h1>
+            <p class="text-xl sm:text-2xl text-gray-200 mt-4">An Overview in an Evolving World</p>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-8 space-y-16">
+        
+        <section id="intro" class="card rounded-xl shadow-xl p-6 md:p-10">
+            <h2 class="text-3xl md:text-4xl font-semibold mb-8 text-cerulean-blue border-b-4 border-sunny-yellow pb-3">1. The AI Revolution Unfolds</h2>
+            <p class="mb-6 text-lg leading-relaxed">Artificial Intelligence (AI) is the simulation of human intelligence in machines programmed to think like humans and mimic their actions. It's about creating systems that can perceive, reason, learn, and act. Think beyond just robots; it's the intelligence *behind* the machines. For decades, AI was largely the realm of science fiction – from HAL 9000 to Tony Stark's JARVIS. This shift highlights AI's practical integration from cautionary tales to helpful assistants.</p>
+            
+            <h3 class="text-2xl md:text-3xl font-medium mt-8 mb-6 text-midnight-blue">A Brief AI Timeline:</h3>
+            <div class="relative">
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <h4 class="font-semibold text-xl text-midnight-blue">Early AI (1950s-1980s)</h4>
+                    <p class="text-md text-gray-700 leading-relaxed">Focus on symbolic AI, foundational concepts like the Turing Test, expert systems, and rule-based reasoning. Early promise and excitement.</p>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <h4 class="font-semibold text-xl text-midnight-blue">AI Winter (1980s-1990s)</h4>
+                    <p class="text-md text-gray-700 leading-relaxed">A period of reduced funding and interest due to limitations in computing power, data availability, and perceived over-promise versus actual delivery.</p>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <h4 class="font-semibold text-xl text-midnight-blue">Modern AI (2000s-Present)</h4>
+                    <p class="text-md text-gray-700 leading-relaxed">A significant resurgence driven by the convergence of three key pillars: vast amounts of available data (Big Data), exponential increases in computational power (especially GPUs), and significant algorithmic breakthroughs, particularly in Machine Learning and Deep Learning.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="successes-overview" class="dark-card rounded-xl shadow-xl p-6 md:p-10">
+            <h2 class="text-3xl md:text-4xl font-semibold mb-8 text-white border-b-4 border-sunny-yellow pb-3">2. AI Successes: Beyond Science Fiction</h2>
+            <p class="mb-8 text-lg leading-relaxed">AI has transitioned from theoretical concepts to delivering tangible, real-world results, transforming diverse sectors. This rapid ascent is fueled by the previously mentioned drivers, achieving feats once confined to imagination. This transformation is evident across several key application areas.</p>
+            <h3 class="text-2xl md:text-3xl font-medium mb-6 text-white text-center">Key Areas of AI Transformation:</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 text-center">
+                <div class="p-6 bg-midnight-blue rounded-lg shadow-lg hover:shadow-turquoise-green/50 transform hover:scale-105 transition-all duration-300">
+                    <span class="text-6xl" role="img" aria-label="Brain Icon">🧠</span>
+                    <h4 class="text-xl font-semibold mt-3 text-sunny-yellow">ML & Deep Learning</h4>
+                </div>
+                <div class="p-6 bg-midnight-blue rounded-lg shadow-lg hover:shadow-turquoise-green/50 transform hover:scale-105 transition-all duration-300">
+                    <span class="text-6xl" role="img" aria-label="Speech Bubble Icon">💬</span>
+                    <h4 class="text-xl font-semibold mt-3 text-sunny-yellow">Natural Language Processing</h4>
+                </div>
+                <div class="p-6 bg-midnight-blue rounded-lg shadow-lg hover:shadow-turquoise-green/50 transform hover:scale-105 transition-all duration-300">
+                    <span class="text-6xl" role="img" aria-label="Eye Icon">👁️</span>
+                    <h4 class="text-xl font-semibold mt-3 text-sunny-yellow">Computer Vision</h4>
+                </div>
+                <div class="p-6 bg-midnight-blue rounded-lg shadow-lg hover:shadow-turquoise-green/50 transform hover:scale-105 transition-all duration-300">
+                     <span class="text-6xl" role="img" aria-label="Healthcare Icon">⚕️</span>
+                    <h4 class="text-xl font-semibold mt-3 text-sunny-yellow">Healthcare & Science</h4>
+                </div>
+                <div class="p-6 bg-midnight-blue rounded-lg shadow-lg hover:shadow-turquoise-green/50 transform hover:scale-105 transition-all duration-300 sm:col-span-2 lg:col-span-1">
+                     <span class="text-6xl" role="img" aria-label="Gaming Controller Icon">🎮</span>
+                    <h4 class="text-xl font-semibold mt-3 text-sunny-yellow">Creative Arts & Gaming</h4>
+                </div>
+            </div>
+        </section>
+
+        <section id="ml-dl" class="card rounded-xl shadow-xl p-6 md:p-10">
+            <h2 class="text-3xl md:text-4xl font-semibold mb-6 text-cerulean-blue border-b-4 border-sunny-yellow pb-3">3. Success Spotlight: Machine Learning & Deep Learning</h2>
+            <p class="mb-4 text-lg leading-relaxed">Machine Learning (ML) is the core engine enabling systems to learn from data without explicit programming. Deep Learning (DL), a powerful subset using multi-layered neural networks, excels at complex pattern recognition. This is where much of AI's recent "magic" originates. We see ML/DL in everyday applications like Netflix recommendations, Google Maps navigation, email spam filters, and even some robotic vacuums intelligently navigating our homes.</p>
+            <div class="chart-container mx-auto mt-8">
+                <canvas id="mlImpactChart"></canvas>
+            </div>
+            <p class="mt-6 text-center text-md text-gray-600">The donut chart above illustrates the significant impact of Machine Learning and Deep Learning across various application domains, showing their proportional influence in areas such as image/vision tasks, speech recognition, and recommendation systems. (Illustrative data)</p>
+        </section>
+
+        <section id="nlp" class="card rounded-xl shadow-xl p-6 md:p-10">
+            <h2 class="text-3xl md:text-4xl font-semibold mb-6 text-cerulean-blue border-b-4 border-sunny-yellow pb-3">4. Success Spotlight: Natural Language Processing (NLP)</h2>
+            <p class="mb-4 text-lg leading-relaxed">Natural Language Processing (NLP) empowers computers to understand, interpret, and generate human language. Think of it as the bridge facilitating human-computer communication. The evolution from fictional droids like C-3PO to the current reality of Large Language Models (LLMs) like ChatGPT is remarkable. These LLMs can generate coherent text, answer complex questions, translate languages, and power sophisticated virtual assistants.</p>
+            <div class="chart-container mx-auto mt-8">
+                <canvas id="nlpCapabilitiesChart"></canvas>
+            </div>
+            <p class="mt-6 text-center text-md text-gray-600">The bar chart highlights the diverse capabilities of LLMs, comparing their (illustrative) performance levels in areas like text generation, question answering, and code generation.</p>
+        </section>
+
+        <section id="computer-vision" class="card rounded-xl shadow-xl p-6 md:p-10">
+            <h2 class="text-3xl md:text-4xl font-semibold mb-6 text-cerulean-blue border-b-4 border-sunny-yellow pb-3">5. Success Spotlight: Computer Vision</h2>
+            <p class="mb-4 text-lg leading-relaxed">Computer Vision enables machines to "see" and interpret visual information. From fictional intelligent cars like KITT in *Knight Rider* to today's real-world self-driving vehicles, CV is fundamental. Its applications include autonomous navigation, medical image analysis for diagnostics (e.g., detecting tumors in scans), and facial recognition for security and authentication.</p>
+            <div class="chart-container mx-auto mt-8">
+                <canvas id="cvGrowthChart"></canvas>
+            </div>
+            <p class="mt-6 text-center text-md text-gray-600">This stacked bar chart shows the (illustrative) growth of Computer Vision applications across key sectors like automotive, healthcare, and security, demonstrating its expanding adoption over time.</p>
+        </section>
+
+        <section id="ai-health-science" class="dark-card rounded-xl shadow-xl p-6 md:p-10">
+            <h2 class="text-3xl md:text-4xl font-semibold mb-8 text-white border-b-4 border-sunny-yellow pb-3">6. Success: AI in Healthcare & Science</h2>
+            <p class="mb-8 text-lg leading-relaxed">AI is making monumental strides in healthcare and scientific research. It's accelerating drug discovery (e.g., AlphaFold predicting protein structures, potentially reducing early-stage timelines by ~40%), enhancing medical diagnostics with high-accuracy image analysis, enabling personalized medicine tailored to individual genetic profiles, and helping researchers sift through massive datasets to unlock new scientific insights.</p>
+            <div class="grid md:grid-cols-2 gap-8 items-center">
+                <div class="text-center p-8 bg-midnight-blue rounded-lg shadow-lg">
+                    <h3 class="text-2xl md:text-3xl font-medium mb-3 text-sunny-yellow">Drug Discovery Impact</h3>
+                    <p class="stat-big-number text-coral-red">~40%</p>
+                    <p class="text-gray-200 mt-2 text-lg">Potential reduction in early-stage drug discovery timelines with AI assistance (Source: Industry Estimates).</p>
+                </div>
+                <div>
+                    <h3 class="text-2xl md:text-3xl font-medium mb-4 text-white">Key Application Areas:</h3>
+                    <ul class="list-disc list-inside space-y-3 text-gray-100 text-lg">
+                        <li>Protein Structure Prediction (e.g., AlphaFold)</li>
+                        <li>Medical Image Analysis (X-rays, MRIs for cancer)</li>
+                        <li>Personalized Treatment Plans (Genomics-based)</li>
+                        <li>Accelerating Clinical Trial Design & Recruitment</li>
+                        <li>Genomic Sequencing & Gene Editing Research</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+        
+        <section id="ai-creative-gaming" class="card rounded-xl shadow-xl p-6 md:p-10">
+            <h2 class="text-3xl md:text-4xl font-semibold mb-6 text-cerulean-blue border-b-4 border-sunny-yellow pb-3">7. Success: AI in Creative Arts & Gaming</h2>
+            <p class="mb-4 text-lg leading-relaxed">AI is transcending its analytical roots to become a partner in creativity. In gaming, it fuels intelligent Non-Player Characters (NPCs) and generates dynamic, ever-changing game worlds. In the arts, AI algorithms compose original music, create unique visual art, and even assist writers in drafting stories and scripts, pushing the boundaries of digital expression.</p>
+             <p class="mb-4 text-md text-gray-700">The bubble chart below visualizes AI's impact across creative domains. The horizontal axis represents **Technical Integration Complexity** (how hard it is to build/use the AI). The vertical axis shows **Creative Output Volume/Diversity** (how much new content AI produces). The **bubble size signifies Overall AI Impact** in that field.</p>
+            <div class="chart-container mx-auto mt-8">
+                <canvas id="aiCreativeImpactChart"></canvas>
+            </div>
+            <p class="mt-6 text-center text-md text-gray-600">This bubble chart maps AI's influence in creative fields by its technical complexity, creative output potential, and overall market impact. (Illustrative data)</p>
+        </section>
+
+        <section id="challenges-overview" class="bg-coral-red text-white rounded-xl shadow-xl p-6 md:p-10">
+            <h2 class="text-3xl md:text-4xl font-semibold mb-4 text-center">8. Central Challenges of AI: The Road Ahead</h2>
+            <p class="text-lg md:text-xl leading-relaxed text-center">While AI's successes are remarkable, its rapid advancement brings forth significant challenges. These are not merely technical hurdles but extend into profound ethical, societal, and philosophical domains, demanding careful consideration, ongoing research, and collaborative global efforts to navigate responsibly and ensure AI develops in a way that benefits all.</p>
+        </section>
+
+        <section id="ethics-bias" class="card rounded-xl shadow-xl p-6 md:p-10">
+            <h2 class="text-3xl md:text-4xl font-semibold mb-6 text-cerulean-blue border-b-4 border-sunny-yellow pb-3">9. Challenge: Ethical Concerns & Bias</h2>
+            <p class="mb-6 text-lg leading-relaxed">A primary ethical hurdle is AI bias. Systems learn from data, and if this data reflects societal prejudices (racial, gender, etc.), AI can perpetuate or even amplify these biases. This leads to unfair outcomes in critical areas like hiring, loan applications, and criminal justice. Ensuring fairness, accountability for AI decisions (who is responsible when an AI errs?), and protecting user privacy are paramount. Fictional explorations like *Westworld*, where AI hosts show programmed biases, resonate with these real-world concerns.</p>
+            <h3 class="text-2xl md:text-3xl font-medium mb-6 text-midnight-blue text-center">Sources of AI Bias</h3>
+            <div class="flex flex-col md:flex-row justify-around items-center space-y-6 md:space-y-0 md:space-x-4 mt-4 h-auto">
+                <div class="venn-circle w-48 h-48 md:w-56 md:h-56 bg-coral-red"><p class="text-lg">Data Bias <br><small>(Unrepresentative sets, historical prejudices)</small></p></div>
+                <div class="venn-circle w-48 h-48 md:w-56 md:h-56 bg-sunny-yellow text-midnight-blue md:-ml-16 md:-mr-16 z-10"><p class="text-lg">Algorithmic Bias <br><small>(Flawed model design, unfair proxies)</small></p></div>
+                <div class="venn-circle w-48 h-48 md:w-56 md:h-56 bg-turquoise-green"><p class="text-lg">Human Bias <br><small>(Interpretation, deployment choices, feedback loops)</small></p></div>
+            </div>
+             <p class="mt-8 text-center text-md text-gray-600">This conceptual Venn diagram illustrates how biases in data, algorithms, and human interaction can intersect and contribute to biased AI outcomes.</p>
+        </section>
+
+        <section id="xai" class="card rounded-xl shadow-xl p-6 md:p-10">
+            <h2 class="text-3xl md:text-4xl font-semibold mb-6 text-cerulean-blue border-b-4 border-sunny-yellow pb-3">10. Challenge: Explainability & Interpretability (XAI)</h2>
+            <p class="mb-6 text-lg leading-relaxed">Many advanced AI models, particularly deep neural networks, operate as "black boxes"—it's incredibly challenging to understand *why* they arrive at a specific decision. This lack of transparency erodes trust, complicates debugging, and hinders regulatory compliance, especially in high-stakes areas like healthcare or finance. If an AI denies a loan, without XAI, we might not know if it was due to valid reasons or an unknown biased factor. XAI aims to make these complex decisions transparent and understandable.</p>
+            <h3 class="text-2xl md:text-3xl font-medium mb-6 text-midnight-blue text-center">The "Black Box" Problem vs. Explainable AI (XAI)</h3>
+            <div class="grid md:grid-cols-2 gap-8 items-start">
+                <div class="p-6 border-2 border-gray-300 rounded-lg bg-gray-50">
+                    <h4 class="text-xl font-semibold text-center text-midnight-blue mb-4">Traditional "Black Box" AI</h4>
+                    <div class="flex flex-col items-center space-y-3">
+                        <div class="flowchart-node w-full">Input Data (e.g., Loan Application)</div>
+                        <div class="flowchart-arrow transform rotate-90 md:rotate-0">➡️</div>
+                        <div class="flowchart-node w-full bg-gray-600 text-white border-gray-500">Opaque AI Model (Internal Logic Hidden)</div>
+                        <div class="flowchart-arrow transform rotate-90 md:rotate-0">➡️</div>
+                        <div class="flowchart-node w-full">Output/Decision (e.g., Approved/Denied)</div>
+                    </div>
+                </div>
+                <div class="p-6 border-2 border-gray-300 rounded-lg bg-gray-50">
+                    <h4 class="text-xl font-semibold text-center text-midnight-blue mb-4">Explainable AI (XAI) Model</h4>
+                    <div class="flex flex-col items-center space-y-3">
+                        <div class="flowchart-node w-full">Input Data (e.g., Loan Application)</div>
+                        <div class="flowchart-arrow transform rotate-90 md:rotate-0">➡️</div>
+                        <div class="flowchart-node w-full bg-turquoise-green text-white">Transparent XAI Model (Interpretable Logic)</div>
+                        <div class="flowchart-arrow transform rotate-90 md:rotate-0">➡️</div>
+                        <div class="flowchart-node w-full">Output/Decision + Explanation (e.g., Denied due to credit score & debt-to-income ratio)</div>
+                    </div>
+                </div>
+            </div>
+            <p class="mt-8 text-center text-md text-gray-600">The flowchart contrasts unexplainable "black box" AI with Explainable AI (XAI), which strives to make AI decision-making processes understandable and transparent.</p>
+        </section>
+
+        <section id="data-requirements" class="dark-card rounded-xl shadow-xl p-6 md:p-10">
+            <h2 class="text-3xl md:text-4xl font-semibold mb-8 text-white border-b-4 border-sunny-yellow pb-3">11. Challenge: Data & Computational Requirements</h2>
+            <p class="mb-8 text-lg leading-relaxed">Modern AI, especially deep learning, is incredibly "data-hungry." Effective model training requires vast volumes of high-quality, accurately labeled data. Acquiring, cleaning, and annotating this data is often a time-consuming, expensive, and resource-intensive bottleneck. Furthermore, for specialized applications or rare events, sufficient data may not even exist. Alongside data, training complex models demands immense computational power (GPUs, TPUs), leading to significant financial costs and considerable energy consumption, which raises environmental concerns.</p>
+            <h3 class="text-2xl md:text-3xl font-medium mb-6 text-white text-center">Hierarchy of AI Data Needs</h3>
+            <div class="max-w-lg mx-auto mt-6 space-y-1">
+                <div class="pyramid-level bg-coral-red" style="width: 60%; margin-left: 20%;">Top: Privacy, Security & Ethics</div>
+                <div class="pyramid-level bg-sunny-yellow text-midnight-blue" style="width: 80%; margin-left: 10%;">Mid-Level: Quality, Annotation & Relevance</div>
+                <div class="pyramid-level bg-turquoise-green" style="width: 100%;">Base: Volume, Variety & Velocity</div>
+            </div>
+            <p class="mt-8 text-center text-md text-gray-200">The pyramid diagram depicts AI's data needs. While sheer volume, variety, and velocity form the base, ensuring high quality, accurate annotation, relevance, and robust privacy, security, and ethical considerations are progressively crucial layers for successful and responsible AI development.</p>
+        </section>
+
+        <section id="robustness-security" class="card rounded-xl shadow-xl p-6 md:p-10">
+            <h2 class="text-3xl md:text-4xl font-semibold mb-6 text-cerulean-blue border-b-4 border-sunny-yellow pb-3">12. Challenge: Robustness & Security</h2>
+            <p class="mb-4 text-lg leading-relaxed">Ensuring AI systems are robust—performing reliably and consistently, even with novel, noisy, or slightly perturbed inputs—is critical. AI models can be vulnerable to "adversarial attacks": maliciously crafted inputs, often imperceptible to humans, that cause the model to misclassify or behave incorrectly. Imagine a stop sign subtly altered to appear as a speed limit sign to a self-driving car's AI. Beyond attacks, general system vulnerabilities also pose security risks, potentially leading to data breaches or manipulation of AI-driven processes.</p>
+            <div class="chart-container mx-auto mt-8">
+                <canvas id="adversarialImpactChart"></canvas>
+            </div>
+            <p class="mt-6 text-center text-md text-gray-600">The bar chart demonstrates the potential impact of adversarial attacks on AI model performance, showing a significant drop in accuracy when faced with manipulated inputs compared to normal, benign inputs. (Illustrative data)</p>
+        </section>
+
+        <section id="societal-impact" class="card rounded-xl shadow-xl p-6 md:p-10">
+            <h2 class="text-3xl md:text-4xl font-semibold mb-6 text-cerulean-blue border-b-4 border-sunny-yellow pb-3">13. Challenge: Societal Impact & Job Displacement</h2>
+            <p class="mb-4 text-lg leading-relaxed">The rise of AI and automation is fundamentally transforming industries and the nature of work, leading to valid concerns about job displacement in certain sectors. This highlights an urgent need for proactive strategies in reskilling and adapting the workforce. Broader societal impacts include the potential for widening economic inequality, complex ethical dilemmas surrounding AI in surveillance or autonomous weapons systems, and the challenge of combating sophisticated AI-generated misinformation (e.g., deepfakes). The fictional world of *Wall-E*, with humanity's over-reliance on automation, serves as a pop-culture reminder to consider these long-term societal effects carefully.</p>
+            <div class="chart-container mx-auto mt-8">
+                <canvas id="jobMarketShiftChart"></canvas>
+            </div>
+            <p class="mt-6 text-center text-md text-gray-600">This line chart presents a hypothetical projection of job displacement due to AI automation versus new job creation in AI-related fields over time, illustrating the complex and dynamic shifts anticipated in the labor market. (Illustrative data)</p>
+        </section>
+
+        <section id="ai-today" class="dark-card rounded-xl shadow-xl p-6 md:p-10">
+            <h2 class="text-3xl md:text-4xl font-semibold mb-8 text-white border-b-4 border-sunny-yellow pb-3">14. AI in Today's Evolving World: A Balancing Act</h2>
+            <p class="mb-8 text-lg leading-relaxed">AI is no longer a futuristic concept; it's deeply embedded in our daily lives and across nearly every industry. From the algorithms that power our smartphones and smart homes to complex systems in transportation, finance, and healthcare, AI is a pervasive and transformative force. The recent explosion in Generative AI capabilities (like sophisticated image and text generators) is further revolutionizing content creation, design, and human-computer interaction, solidifying AI's role as a general-purpose technology with impact akin to electricity or the internet. The path forward requires a delicate balance: vigorously fostering innovation while proactively addressing its profound ethical, societal, and technical challenges.</p>
+            <h3 class="text-2xl md:text-3xl font-medium mb-6 text-white text-center">Sectors Transformed by AI:</h3>
+            <div class="word-cloud text-center p-6 bg-midnight-blue rounded-lg shadow-lg">
+                <span class="text-3xl font-bold bg-coral-red">Healthcare</span>
+                <span class="text-2xl bg-sunny-yellow text-midnight-blue">Finance</span>
+                <span class="text-xl bg-turquoise-green">Transportation</span>
+                <span class="text-lg bg-coral-red opacity-80">Retail</span>
+                <span class="text-2xl font-semibold bg-sunny-yellow text-midnight-blue opacity-90">Manufacturing</span>
+                <span class="text-xl bg-turquoise-green">Entertainment</span>
+                <span class="text-3xl bg-coral-red opacity-90">Education</span>
+                <span class="text-lg bg-sunny-yellow text-midnight-blue">Agriculture</span>
+                <span class="text-2xl bg-turquoise-green font-medium">Customer Service</span>
+                <span class="text-xl bg-coral-red">Logistics</span>
+                <span class="text-2xl bg-sunny-yellow text-midnight-blue">Energy</span>
+            </div>
+            <p class="mt-8 text-center text-md text-gray-200">The word cloud above visually represents the diverse range of sectors significantly impacted and transformed by artificial intelligence, highlighting its broad applicability. Larger and bolder words indicate areas with particularly prominent AI integration.</p>
+        </section>
+
+        <section id="future-role" class="card rounded-xl shadow-xl p-6 md:p-10">
+            <h2 class="text-3xl md:text-4xl font-semibold mb-6 text-cerulean-blue border-b-4 border-sunny-yellow pb-3">15. The Future of AI: Your Role</h2>
+            <p class="mb-6 text-lg leading-relaxed">The field of Artificial Intelligence is in a state of continuous, rapid evolution. Key future trends point towards AI systems that are more adaptive and capable of continual learning, more seamlessly integrated with the physical world through embodied AI (robotics), more collaborative with human partners, and developed with an ever-stronger emphasis on ethics, fairness, transparency, and responsibility.</p>
+            <h3 class="text-2xl md:text-3xl font-medium mb-6 text-midnight-blue">Key Trends Shaping Tomorrow:</h3>
+            <ul class="list-disc list-inside space-y-4 text-gray-700 text-lg">
+                <li><strong class="text-midnight-blue">Continual Learning & Adaptability:</strong> AI systems that dynamically learn and adapt in real-time from new data streams and changing environments, without constant retraining from scratch.</li>
+                <li><strong class="text-midnight-blue">Embodied AI & Robotics:</strong> Deeper integration of AI into physical robots and systems, enabling more sophisticated interaction with and navigation of the real world.</li>
+                <li><strong class="text-midnight-blue">Human-AI Collaboration:</strong> A shift towards AI augmenting human capabilities and fostering synergistic partnerships, rather than solely focusing on automation or replacement.</li>
+                <li><strong class="text-midnight-blue">Responsible AI & Ethics by Design:</strong> An increasing global emphasis on building AI systems that are inherently fair, transparent, accountable, secure, and aligned with human values from the outset.</li>
+                <li><strong class="text-midnight-blue">Interdisciplinary Research & Development:</strong> The future of AI will increasingly be shaped by robust collaboration across diverse fields including computer science, cognitive science, ethics, psychology, sociology, and law.</li>
+            </ul>
+            <p class="mt-8 text-lg leading-relaxed font-semibold text-cerulean-blue">As future computer scientists, AI researchers, software developers, product managers, ethicists, and policymakers, your understanding of both AI's immense potential and its complex challenges is crucial. You will be instrumental in steering AI's development responsibly, ensuring that its power is harnessed to benefit all of humanity in an equitable and sustainable manner.</p>
+        </section>
+        
+    </main>
+
+    <footer class="py-12 text-center border-t-4 border-cerulean-blue mt-16 bg-midnight-blue text-white">
+        <p class="text-2xl font-semibold">Thank You!</p>
+        <p class="text-md text-gray-300 mt-2">Info based on Module 1,  CPSC 1380 AI Foundations, AI: Successes and Challenges in an Evolving World, Billy Spann.</p>
+        <p class="text-sm text-gray-400 mt-1">All data presented in charts is illustrative and synthesized for demonstration purposes.</p>
+    </footer>
+
+    <script>
+        const coralRed = '#FF6B6B';
+        const sunnyYellow = '#FFD166';
+        const turquoiseGreen = '#06D6A0';
+        const ceruleanBlue = '#118AB2';
+        const midnightBlue = '#073B4C'; 
+        const chartTextColor = '#073B4C'; // For chart labels on light cards
+        const chartGridColor = '#D1D5DB'; // Tailwind gray-300 for chart grids
+
+        function processLabel(label, maxLength = 16) {
+            if (typeof label !== 'string' || label.length <= maxLength) {
+                return label;
+            }
+            const words = label.split(' ');
+            const lines = [];
+            let currentLine = '';
+            for (const word of words) {
+                if ((currentLine + ' ' + word).trim().length > maxLength && currentLine.length > 0) {
+                    lines.push(currentLine);
+                    currentLine = word;
+                } else {
+                    currentLine = (currentLine + ' ' + word).trim();
+                }
+            }
+            if (currentLine.length > 0) {
+                lines.push(currentLine);
+            }
+            return lines.length > 0 ? lines : [label];
+        }
+        
+        const tooltipTitleCallback = function(tooltipItems) {
+            const item = tooltipItems[0];
+            if (!item || !item.chart || !item.chart.data || !item.chart.data.labels || typeof item.dataIndex === 'undefined') return '';
+            let label = item.chart.data.labels[item.dataIndex];
+            if (Array.isArray(label)) {
+                return label.join(' ');
+            } else {
+                return label;
+            }
+        };
+
+        const commonChartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { 
+                    labels: { color: chartTextColor, font: { size: 12, family: 'Inter' } },
+                    position: 'bottom' 
+                },
+                tooltip: { 
+                    callbacks: { title: tooltipTitleCallback },
+                    titleFont: { size: 14, family: 'Inter' },
+                    bodyFont: { size: 12, family: 'Inter' },
+                    backgroundColor: 'rgba(7,59,76,0.85)', // Midnight Blue with opacity
+                    titleColor: '#FFFFFF',
+                    bodyColor: '#FFFFFF',
+                    padding: 10,
+                    cornerRadius: 4,
+                    boxPadding: 4,
+                }
+            },
+            scales: {
+                y: { 
+                    ticks: { color: chartTextColor, font: { size: 11, family: 'Inter' } }, 
+                    grid: { color: chartGridColor, drawBorder: false } 
+                },
+                x: { 
+                    ticks: { color: chartTextColor, font: { size: 11, family: 'Inter' } }, 
+                    grid: { color: chartGridColor, drawBorder: false } 
+                }
+            }
+        };
+
+        // Navigation Scroll
+        document.querySelectorAll('#main-nav button').forEach(button => {
+            button.addEventListener('click', function() {
+                const targetId = this.dataset.target;
+                const targetSection = document.getElementById(targetId);
+                if (targetSection) {
+                    targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Active Nav Link Highlighting
+        const sections = document.querySelectorAll('section[id]');
+        const navButtons = document.querySelectorAll('#main-nav button');
+
+        const observerOptions = {
+            root: null, // relative to document viewport 
+            rootMargin: '-50% 0px -50% 0px', // trigger when section is in middle of viewport
+            threshold: 0 //_can_ be an array of thresholds
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                const id = entry.target.getAttribute('id');
+                const navButton = document.querySelector(`#main-nav button[data-target="${id}"]`);
+
+                if (entry.isIntersecting) {
+                    navButtons.forEach(btn => btn.classList.remove('nav-active', 'text-coral-red', 'font-bold'));
+                    if (navButton) {
+                        navButton.classList.add('nav-active', 'text-coral-red', 'font-bold');
+                    }
+                }
+            });
+        }, observerOptions);
+
+        sections.forEach(section => {
+            observer.observe(section);
+        });
+
+
+        // Chart Implementations
+        const mlImpactCtx = document.getElementById('mlImpactChart')?.getContext('2d');
+        if (mlImpactCtx) {
+            new Chart(mlImpactCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: [processLabel('Image & Vision'), processLabel('Speech Recognition'), processLabel('Recommendation Systems'), processLabel('Fraud Detection'), processLabel('NLP Models')],
+                    datasets: [{
+                        label: 'Impact of ML/DL',
+                        data: [30, 20, 25, 15, 10],
+                        backgroundColor: [coralRed, sunnyYellow, turquoiseGreen, ceruleanBlue, '#F78C6C'],
+                        borderColor: '#FFFFFF',
+                        borderWidth: 3,
+                        hoverOffset: 8
+                    }]
+                },
+                options: { ...commonChartOptions, cutout: '60%', plugins: { ...commonChartOptions.plugins, legend: {...commonChartOptions.plugins.legend, position: 'top'} } }
+            });
+        }
+
+        const nlpCtx = document.getElementById('nlpCapabilitiesChart')?.getContext('2d');
+        if (nlpCtx) {
+            new Chart(nlpCtx, {
+                type: 'bar',
+                data: {
+                    labels: [processLabel('Text Generation'), processLabel('Q&A Systems'), processLabel('Summarization'), processLabel('Machine Translation'), processLabel('Sentiment Analysis'), processLabel('Code Generation')],
+                    datasets: [{
+                        label: 'LLM Capability Score (Illustrative)',
+                        data: [90, 85, 80, 88, 75, 78],
+                        backgroundColor: [coralRed, sunnyYellow, turquoiseGreen, ceruleanBlue, '#F78C6C', '#82AAFF'],
+                        borderRadius: 4,
+                        barPercentage: 0.7
+                    }]
+                },
+                options: { ...commonChartOptions, plugins: { ...commonChartOptions.plugins, legend: {display: false} } }
+            });
+        }
+
+        const cvCtx = document.getElementById('cvGrowthChart')?.getContext('2d');
+        if (cvCtx) {
+            new Chart(cvCtx, {
+                type: 'bar',
+                data: {
+                    labels: [processLabel('2022'), processLabel('2023'), processLabel('2024 (Est)')],
+                    datasets: [
+                        { label: 'Automotive', data: [20, 25, 35], backgroundColor: coralRed, borderRadius: 4 },
+                        { label: 'Healthcare', data: [15, 22, 30], backgroundColor: sunnyYellow, borderRadius: 4 },
+                        { label: 'Security', data: [25, 28, 32], backgroundColor: turquoiseGreen, borderRadius: 4 },
+                        { label: 'Retail', data: [10, 15, 20], backgroundColor: ceruleanBlue, borderRadius: 4 }
+                    ]
+                },
+                options: { ...commonChartOptions, scales: { x: { ...commonChartOptions.scales.x, stacked: true }, y: { ...commonChartOptions.scales.y, stacked: true } }, plugins: { ...commonChartOptions.plugins, tooltip: {...commonChartOptions.plugins.tooltip, mode: 'index', intersect: false } } }
+            });
+        }
+        
+        const creativeImpactCtx = document.getElementById('aiCreativeImpactChart')?.getContext('2d');
+        if (creativeImpactCtx) {
+            new Chart(creativeImpactCtx, {
+                type: 'bubble',
+                data: {
+                    datasets: [
+                        { label: processLabel('Gaming (NPCs, Content Gen)'), data: [{x: 7, y: 8, r: 25}], backgroundColor: coralRed + 'BF', borderColor: coralRed, borderWidth: 2 },
+                        { label: processLabel('Visual Arts (Generative)'), data: [{x: 6, y: 7, r: 20}], backgroundColor: sunnyYellow + 'BF', borderColor: sunnyYellow, borderWidth: 2 },
+                        { label: processLabel('Music Composition'), data: [{x: 8, y: 5, r: 18}], backgroundColor: turquoiseGreen + 'BF', borderColor: turquoiseGreen, borderWidth: 2 },
+                        { label: processLabel('Writing (Story Assist)'), data: [{x: 5, y: 9, r: 22}], backgroundColor: ceruleanBlue + 'BF', borderColor: ceruleanBlue, borderWidth: 2 }
+                    ]
+                },
+                options: { ...commonChartOptions, 
+                    scales: { 
+                        x: { 
+                            display: true, 
+                            min: 0, max: 10, 
+                            title: { display: true, text: 'Technical Integration Complexity (0-Low, 10-High)', color: chartTextColor, font: {size: 12, family: 'Inter'} },
+                            ticks: { stepSize: 2, color: chartTextColor, font: {size: 10, family: 'Inter'} },
+                            grid: { color: chartGridColor }
+                        }, 
+                        y: { 
+                            display: true, 
+                            min: 0, max: 10,
+                            title: { display: true, text: 'Creative Output Volume/Diversity (0-Low, 10-High)', color: chartTextColor, font: {size: 12, family: 'Inter'} },
+                            ticks: { stepSize: 2, color: chartTextColor, font: {size: 10, family: 'Inter'} },
+                            grid: { color: chartGridColor }
+                        } 
+                    },
+                    plugins: { ...commonChartOptions.plugins, 
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (Array.isArray(label)) label = label.join(' ');
+                                    if (label) { label += ': '; }
+                                    if (context.parsed.x !== null) { label += `Complexity: ${context.parsed.x.toFixed(1)}, `; }
+                                    if (context.parsed.y !== null) { label += `Output: ${context.parsed.y.toFixed(1)}, `; }
+                                    if (context.parsed.r !== null) { label += `Impact: ${context.parsed.r}`; }
+                                    return label;
+                                }
+                            }
+                        }
+                    } 
+                }
+            });
+        }
+
+        const advImpactCtx = document.getElementById('adversarialImpactChart')?.getContext('2d');
+        if (advImpactCtx) {
+             new Chart(advImpactCtx, {
+                type: 'bar',
+                data: {
+                    labels: [processLabel('Normal Input Accuracy'), processLabel('Adversarial Attack Accuracy')],
+                    datasets: [{
+                        label: 'Model Accuracy (%)',
+                        data: [92, 35],
+                        backgroundColor: [turquoiseGreen, coralRed],
+                        borderRadius: 4,
+                        barPercentage: 0.5
+                    }]
+                },
+                options: { ...commonChartOptions, indexAxis: 'y', plugins: { ...commonChartOptions.plugins, legend: {display: false} }, scales: { x: { ...commonChartOptions.scales.x, min:0, max:100, ticks: { ...commonChartOptions.scales.x.ticks, callback: function(value) { return value + "%" } } } } }
+            });
+        }
+
+        const jobMarketCtx = document.getElementById('jobMarketShiftChart')?.getContext('2d');
+        if (jobMarketCtx) {
+            new Chart(jobMarketCtx, {
+                type: 'line',
+                data: {
+                    labels: [processLabel('2023'), processLabel('2025'), processLabel('2027'), processLabel('2030 (Proj.)')],
+                    datasets: [
+                        {
+                            label: 'Jobs Displaced by AI (Illustrative Units)',
+                            data: [5, 15, 30, 50],
+                            borderColor: coralRed,
+                            backgroundColor: coralRed + '33', 
+                            tension: 0.2,
+                            fill: true,
+                            pointBackgroundColor: coralRed,
+                            pointRadius: 4,
+                            pointHoverRadius: 6
+                        },
+                        {
+                            label: 'New Jobs Created by AI (Illustrative Units)',
+                            data: [2, 8, 20, 45],
+                            borderColor: turquoiseGreen,
+                            backgroundColor: turquoiseGreen + '33', 
+                            tension: 0.2,
+                            fill: true,
+                            pointBackgroundColor: turquoiseGreen,
+                            pointRadius: 4,
+                            pointHoverRadius: 6
+                        }
+                    ]
+                },
+                options: { ...commonChartOptions, plugins: { ...commonChartOptions.plugins, tooltip: {...commonChartOptions.plugins.tooltip, mode: 'index', intersect: false } } }
+            });
+        }
+    </script>
+</body>
+</html>
